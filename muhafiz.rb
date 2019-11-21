@@ -12,13 +12,35 @@ end
 
 def appendthis(filename,thedata)
   myfile = File.open(filename,"a")
-  myfile.write(thedata)
+  myfile.write(thedata , "\n")
+end
+
+def writethis(filename,thedata)
+  myfile = File.open(filename,"w")
+  myfile.write(data)
 end
 
 def readallofthat(filename)
   myfile = File.open(filename,"r")
   readedtext = myfile.read
   return readedtext
+end
+
+def getsecretobject(filename)
+  myfile = File.open(filename,"r")
+  readed_secret_data = myfile.readlines
+  readed_iv = myfile.readlines
+  readed_salt = myfile.readlines
+  readed_auth_tag = myfile.readlines
+  readed_auth_data = myfile.readlines
+  readed_secret_object = SimpleCrypt::Secret.new
+  readed_secret_object.secret_data = readed_secret_data
+  readed_secret_object.iv = readed_iv
+  readed_secret_object.salt = readed_salt
+  readed_secret_object.auth_tag = readed_auth_tag
+  readed_secret_object.auth_data = readed_auth_data
+  return readed_secret_object
+
 end
  
 def getuserinputs
@@ -41,12 +63,17 @@ getuserinputs()
 
 if $usermode == "s"
   crypted_pass = cryptthis($password,$masterpass)
-  appendthis("kasa",crypted_pass.secret_data)
+
+  appendthis("kasa",crypted_pass.secret_data) #bunu appendthis ile değiştir
+  appendthis("kasa",crypted_pass.iv )
+  appendthis("kasa",crypted_pass.salt )
+  appendthis("kasa",crypted_pass.auth_tag )
+  appendthis("kasa",crypted_pass.auth_data)
 end
 
 if $usermode =="d"
-  readed_file = readallofthat("kasa")
-  decrypted_text = decryptthis(readed_file,$masterpass)
+  my_secret_object = getsecretobject("kasa")
+  decrypted_text = SimpleCrypt.decrypt(my_secret_object,$masterpass)
   puts(decrypted_text)
 end
 
