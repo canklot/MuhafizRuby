@@ -1,6 +1,9 @@
 require 'simple_crypt'
+require 'crypt/blowfish'
 
-def cryptthis(thedata,masterkey)
+#   Functions   ---------------------------------------------------
+
+def encryptthis(thedata,masterkey)
   cryptedtext = SimpleCrypt.encrypt(thedata,masterkey)
   return cryptedtext
 end
@@ -19,7 +22,7 @@ end
 
 def writethis(filename,thedata)
   myfile = File.open(filename,"w")
-  myfile.write(data)
+  myfile.write(thedata)
   myfile.close
 end
 
@@ -33,11 +36,11 @@ end
 
 def getsecretobject(filename)
   myfile = File.open(filename,"r")
-  readed_secret_data = myfile.readline
-  readed_iv = myfile.readline
-  readed_salt = myfile.readline
-  readed_auth_tag = myfile.readline
-  readed_auth_data = myfile.readline
+  readed_secret_data = myfile.readline.chomp
+  readed_iv = myfile.readline.chomp
+  readed_salt = myfile.readline.chomp
+  readed_auth_tag = myfile.readline.chomp
+  readed_auth_data = myfile.readline.chomp
   readed_secret_object = SimpleCrypt::Secret.new
   readed_secret_object.secret_data = readed_secret_data
   readed_secret_object.iv = readed_iv
@@ -46,6 +49,19 @@ def getsecretobject(filename)
   readed_secret_object.auth_data = readed_auth_data
   return readed_secret_object
 
+end
+
+def encryptblowfish(input,masterinput)
+  blowfish = Crypt::Blowfish.new(masterinput) # i didnt get what double colons means
+  encryptedBlock = blowfish.encrypt_block(input)
+  return encryptedBlock
+end
+
+
+def decryptblowfish(input,masterinput)
+  blowfish = Crypt::Blowfish.new("A key up to 56 bytes long")
+  decryptedBlock = blowfish.decrypt_block(encryptedBlock)
+  return decryptedBlock
 end
  
 def getuserinputs
@@ -64,23 +80,30 @@ def getuserinputs
   $masterpass = gets.chomp
 end
 
+
+#   Main    ---------------------------------------------------------------------------------
+
+
 getuserinputs()
 
 if $usermode == "s"
-  crypted_pass = cryptthis($password,$masterpass)
-
-  appendthis("kasa",crypted_pass.secret_data) #bunu appendthis ile değiştir
-  appendthis("kasa",crypted_pass.iv )
-  appendthis("kasa",crypted_pass.salt )
-  appendthis("kasa",crypted_pass.auth_tag )
+  crypted_pass = encryptthis($password,$masterpass)
+  appendthis("kasa",crypted_pass.secret_data)
+  appendthis("kasa",crypted_pass.iv)
+  appendthis("kasa",crypted_pass.salt)
+  appendthis("kasa",crypted_pass.auth_tag)
   appendthis("kasa",crypted_pass.auth_data)
+
 end
 
 if $usermode =="d"
-  my_secret_object = getsecretobject("kasa")
-  puts my_secret_object.secret_data
-  decrypted_text = SimpleCrypt.decrypt(my_secret_object,$masterpass)
-  puts(decrypted_text)
+  #readed = readallofthat("kasa")
+  #decrypted_text = decryptblowfish(readed,$masterpass)
+  #puts(decrypted_text)
+
+  readedobject = getsecretobject("kasa")
+  decypted_text = decryptthis(readedobject,$masterpass)
+  puts decypted_text
 end
 
 
