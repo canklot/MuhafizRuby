@@ -13,26 +13,31 @@ end
 def appendthis(filename,thedata)
   myfile = File.open(filename,"a")
   myfile.write(thedata , "\n")
+  myfile.close
+
 end
 
 def writethis(filename,thedata)
   myfile = File.open(filename,"w")
   myfile.write(data)
+  myfile.close
 end
 
 def readallofthat(filename)
   myfile = File.open(filename,"r")
   readedtext = myfile.read
+  myfile.close
   return readedtext
+
 end
 
 def getsecretobject(filename)
   myfile = File.open(filename,"r")
-  readed_secret_data = myfile.readlines
-  readed_iv = myfile.readlines
-  readed_salt = myfile.readlines
-  readed_auth_tag = myfile.readlines
-  readed_auth_data = myfile.readlines
+  readed_secret_data = myfile.readline
+  readed_iv = myfile.readline
+  readed_salt = myfile.readline
+  readed_auth_tag = myfile.readline
+  readed_auth_data = myfile.readline
   readed_secret_object = SimpleCrypt::Secret.new
   readed_secret_object.secret_data = readed_secret_data
   readed_secret_object.iv = readed_iv
@@ -73,6 +78,7 @@ end
 
 if $usermode =="d"
   my_secret_object = getsecretobject("kasa")
+  puts my_secret_object.secret_data
   decrypted_text = SimpleCrypt.decrypt(my_secret_object,$masterpass)
   puts(decrypted_text)
 end
