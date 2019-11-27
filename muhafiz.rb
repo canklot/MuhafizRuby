@@ -1,5 +1,6 @@
 require 'simple_crypt'
 require 'crypt/blowfish'
+require 'unix_crypt'
 
 #   Functions   ---------------------------------------------------
 
@@ -51,8 +52,19 @@ def getsecretobject(filename)
 
 end
 
+def secretobject_writetofile(secretobject)
+  appendthis("kasa",secretobject.secret_data)
+  appendthis("kasa",secretobject.iv)
+  appendthis("kasa",secretobject.salt)
+  appendthis("kasa",secretobject.auth_tag)
+  appendthis("kasa",secretobject.auth_data)
+  appendthis("kasa","")
+
+end
+
+
 def encryptblowfish(input,masterinput)
-  blowfish = Crypt::Blowfish.new(masterinput) # i didnt get what double colons means
+  blowfish = Crypt::Blowfish.new(masterinput) 
   encryptedBlock = blowfish.encrypt_block(input)
   return encryptedBlock
 end
@@ -70,15 +82,34 @@ def getuserinputs
     puts("Please select a mode:\n For Store s , for decrypt d , for update u")
     $usermode = gets.chomp
   end
-  puts("Please enter the name of the site or application or device")
-  $site_app_device = gets.chomp
+
+  puts("Please enter the name of the site")
+  $site = gets.chomp
+
+  puts ("please enter the username")
+  $username = gets.chomp
+
   if $usermode=="s"
     puts("Please enter your password")
     $password = gets.chomp
   end
+
   puts("Please enter your MasterPassword")
   $masterpass = gets.chomp
+
 end
+
+def hashthis(input)
+  hashed = UnixCrypt::SHA256.build(input,"")
+  return hashed
+end
+
+
+
+
+
+
+
 
 
 #   Main    ---------------------------------------------------------------------------------
@@ -88,11 +119,13 @@ getuserinputs()
 
 if $usermode == "s"
   crypted_pass = encryptthis($password,$masterpass)
-  appendthis("kasa",crypted_pass.secret_data)
-  appendthis("kasa",crypted_pass.iv)
-  appendthis("kasa",crypted_pass.salt)
-  appendthis("kasa",crypted_pass.auth_tag)
-  appendthis("kasa",crypted_pass.auth_data)
+  hashed_site =hashthis($site)
+  hashed_username = hashthis($username)
+  
+  appendthis("kasa",hashed_site)
+  appendthis("kasa",hashed_username)
+  secretobject_writetofile(crypted_pass)
+  appendthis("kasa","")
 
 end
 
@@ -100,7 +133,18 @@ if $usermode =="d"
   #readed = readallofthat("kasa")
   #decrypted_text = decryptblowfish(readed,$masterpass)
   #puts(decrypted_text)
-
+  
+  hashed_site =hashthis($site)
+  hashed_username = hashthis($username)
+  kasa = readallofthat("kasa")
+  index_site = kasa.index(hashed_site)
+  index_username = kasa.index(hashed_username)
+  if index_site and index_username do
+    puts "Login credentials cant found"
+    exit
+  end
+  if index_site do
+    kasa.index(index_username,index_site,index_site+47)
   readedobject = getsecretobject("kasa")
   decypted_text = decryptthis(readedobject,$masterpass)
   puts decypted_text
