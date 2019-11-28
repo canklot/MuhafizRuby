@@ -1,18 +1,13 @@
-text = "bu bir yazi asd fgh jkli"
-puts text.index("i")
+
 myfile = File.open("kasa","r")
-myfile.sysread(98)
-line = myfile.readline
-puts line
+okunan = myfile.read
+myfile.close
 
-a=8
-b=9
+taintmetin = "asd
+fgh
+qwe
+zxc
+"
 
-if a
-    puts "awfawf"
-    if b
-        puts "awfawf"
-        puts "awfawf"
-        puts "awfawf"
-    end
-end
+
+

@@ -49,6 +49,7 @@ def getsecretobject(filename,startindex)
   readed_secret_object.salt = readed_salt
   readed_secret_object.auth_tag = readed_auth_tag
   readed_secret_object.auth_data = readed_auth_data
+  myfile.close
   return readed_secret_object
 
 end
@@ -132,26 +133,22 @@ if $usermode == "s"
 end
 
 if $usermode =="d"
-  #readed = readallofthat("kasa")
-  #decrypted_text = decryptblowfish(readed,$masterpass)
-  #puts(decrypted_text)
   
   hashed_site =hashthis($site)
   hashed_username = hashthis($username)
   kasa = readallofthat("kasa")
   index_site = kasa.index(hashed_site)
   index_username = kasa.index(hashed_username)
+
   if !((index_site >-1) and (index_username > -1))
     puts "Login credentials cant found"
     exit
   end
-  puts index_site#
+  
   if index_site > -1
     index_username_file = kasa[index_site+48,index_site+97].index(hashed_username)+49
-    puts index_username_file#
     if index_username_file > -1
       readedobject = getsecretobject("kasa",index_username_file+hashed_username.length+2)
-      puts readedobject #
       decypted_text = decryptthis(readedobject,$masterpass)
       puts decypted_text
     end
