@@ -35,8 +35,9 @@ def readallofthat(filename)
 
 end
 
-def getsecretobject(filename)
+def getsecretobject(filename,startindex)
   myfile = File.open(filename,"r")
+  myfile.sysread(startindex)
   readed_secret_data = myfile.readline.chomp
   readed_iv = myfile.readline.chomp
   readed_salt = myfile.readline.chomp
@@ -127,6 +128,7 @@ if $usermode == "s"
   secretobject_writetofile(crypted_pass)
   appendthis("kasa","")
 
+
 end
 
 if $usermode =="d"
@@ -139,15 +141,22 @@ if $usermode =="d"
   kasa = readallofthat("kasa")
   index_site = kasa.index(hashed_site)
   index_username = kasa.index(hashed_username)
-  if index_site and index_username do
+  if !((index_site >-1) and (index_username > -1))
     puts "Login credentials cant found"
     exit
   end
-  if index_site do
-    kasa.index(index_username,index_site,index_site+47)
-  readedobject = getsecretobject("kasa")
-  decypted_text = decryptthis(readedobject,$masterpass)
-  puts decypted_text
+  puts index_site#
+  if index_site > -1
+    index_username_file = kasa[index_site+48,index_site+97].index(hashed_username)+49
+    puts index_username_file#
+    if index_username_file > -1
+      readedobject = getsecretobject("kasa",index_username_file+hashed_username.length+2)
+      puts readedobject #
+      decypted_text = decryptthis(readedobject,$masterpass)
+      puts decypted_text
+    end
+  end
 end
 
 
+#Notes : Doesnt work when username and pass are same
