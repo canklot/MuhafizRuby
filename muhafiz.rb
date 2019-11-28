@@ -137,6 +137,7 @@ if $usermode =="d"
   hashed_site =hashthis($site)
   hashed_username = hashthis($username)
   kasa = readallofthat("kasa")
+  kasa = kasa.gsub("\n", ' ')
   index_site = kasa.index(hashed_site)
   index_username = kasa.index(hashed_username)
 
@@ -146,7 +147,7 @@ if $usermode =="d"
   end
   
   if index_site > -1
-    index_username_file = kasa[index_site+48,index_site+97].index(hashed_username)+49
+    index_username_file = kasa[index_site+48,48].index(hashed_username)+49
     if index_username_file > -1
       readedobject = getsecretobject("kasa",index_username_file+hashed_username.length+2)
       decypted_text = decryptthis(readedobject,$masterpass)
