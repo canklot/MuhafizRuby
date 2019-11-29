@@ -35,21 +35,53 @@ def readallofthat(filename)
 
 end
 
-def getsecretobject(filename,startindex)
-  myfile = File.open(filename,"r")
-  myfile.sysread(startindex)
-  readed_secret_data = myfile.readline.chomp
-  readed_iv = myfile.readline.chomp
-  readed_salt = myfile.readline.chomp
-  readed_auth_tag = myfile.readline.chomp
-  readed_auth_data = myfile.readline.chomp
+def getsecretobject(filename,inhashedusername)
+  okunan = readallofthat("kasa")
+  start = okunan.index(inhashedusername)+inhashedusername.length+1
+  finish = okunan.index("\n",start) 
+  charsayisi= okunan.index("\n",start) - start
+  readed_secret_data = okunan[start , charsayisi]
+
+  #puts "start" ,start
+  #puts okunan.index("\n",start)
+  #puts "charsayisi" ,charsayisi
+  #puts readed_secret_data
+
+  start = finish+1
+  puts "start" ,start
+
+  charsayisi= okunan.index("\n",start) - start
+  #puts "charsayisi" ,charsayisi
+
+  readed_iv = okunan[start,charsayisi]
+  #puts readed_iv
+  finish = okunan.index("\n",start) 
+  start = finish+1
+  #puts "start" ,start
+
+  charsayisi= okunan.index("\n",start) - start 
+  #puts "charsayisi" ,charsayisi
+
+  readed_salt = okunan[start,charsayisi]
+  # puts readed_salt
+  finish = okunan.index("\n",start) 
+  start = finish+1
+  charsayisi= okunan.index("\n",start) - start
+
+  readed_auth_tag = okunan[start,charsayisi]
+
+  finish = okunan.index("\n",start) 
+  start = finish+1
+  charsayisi= okunan.index("\n",start) - start 
+  
+  readed_auth_data = okunan[start,charsayisi]
   readed_secret_object = SimpleCrypt::Secret.new
   readed_secret_object.secret_data = readed_secret_data
   readed_secret_object.iv = readed_iv
   readed_secret_object.salt = readed_salt
   readed_secret_object.auth_tag = readed_auth_tag
   readed_secret_object.auth_data = readed_auth_data
-  myfile.close
+  
   return readed_secret_object
 
 end
@@ -131,13 +163,24 @@ if $usermode == "s"
 
 
 end
+def howmany(filename,inputstring)
+  counter=0
+  for i in filename
+    if i==inputstring
+      counter+=1
+    end
+  end
+  return counter
+
+
+end
 
 if $usermode =="d"
   
   hashed_site =hashthis($site)
   hashed_username = hashthis($username)
   kasa = readallofthat("kasa")
-  kasa = kasa.gsub("\n", ' ')
+  kasa = kasa.gsub("\n", '')
   index_site = kasa.index(hashed_site)
   index_username = kasa.index(hashed_username)
 
@@ -145,11 +188,11 @@ if $usermode =="d"
     puts "Login credentials cant found"
     exit
   end
-  
+  #hata var hep face şifresi veriyor
   if index_site > -1
-    index_username_file = kasa[index_site+48,48].index(hashed_username)+49
-    if index_username_file > -1
-      readedobject = getsecretobject("kasa",index_username_file+hashed_username.length+2)
+    #ben burayı neden ekledim ki ? index_username_file = kasa[index_site+48,48].index(hashed_username)+49
+    if index_username > -1
+      readedobject = getsecretobject("kasa",hashed_username)
       decypted_text = decryptthis(readedobject,$masterpass)
       puts decypted_text
     end
