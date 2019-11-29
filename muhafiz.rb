@@ -107,16 +107,7 @@ def hashthis(input)
   return hashed
 end
 
-
-
-
-
-
-
-
-
 #   Main    ---------------------------------------------------------------------------------
-
 
 getuserinputs()
 
@@ -152,7 +143,4 @@ if $usermode =="d"
   else
     print "\nYour password is: " ,decypted_text ,"\n\n"
   end
-
-    
-  
 end
