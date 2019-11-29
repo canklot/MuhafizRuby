@@ -17,7 +17,6 @@ def appendthis(filename,thedata)
   myfile = File.open(filename,"a")
   myfile.write(thedata , "\n")
   myfile.close
-
 end
 
 def writethis(filename,thedata)
@@ -31,7 +30,6 @@ def readallofthat(filename)
   readedtext = myfile.read
   myfile.close
   return readedtext
-
 end
 
 def getsecretobject(filename,inhashedusername)
@@ -142,24 +140,19 @@ if $usermode =="d"
   index_username = kasa.index(hashed_username)
 
   if !((index_site !=nil) and (index_username !=nil))
-    puts "Login credentials cant found"
+    puts "\nLogin credentials cant found"
     exit
   end
   
-  if index_site > -1
-    if index_username > -1
-      readedobject = getsecretobject("kasa",hashed_username)
-      decypted_text = decryptthis(readedobject,$masterpass)
+  readedobject = getsecretobject("kasa",hashed_username)
+  decypted_text = decryptthis(readedobject,$masterpass)
 
-      if decypted_text ==nil
-        puts "\n Something went wrong. Your masterpass can be invalid"
-      else
-      print "\nYour password is: " ,decypted_text ,"\n\n"
-      end
-
-    end
+  if decypted_text ==nil
+    puts "\n Something went wrong. Your masterpass can be invalid"
+  else
+    print "\nYour password is: " ,decypted_text ,"\n\n"
   end
+
+    
+  
 end
-
-
-#Notes : Doesnt work when username and pass are same
